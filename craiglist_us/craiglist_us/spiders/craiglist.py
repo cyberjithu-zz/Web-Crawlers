@@ -59,4 +59,11 @@ class CraiglistSpider(Spider):
                               )
 
     def parse_links(self, response):
-        pass
+        NEXT_PAGE_XPATH = '//a[@class="button next"]/@href'
+
+        next_page = response.xpath(NEXT_PAGE_XPATH).extract()
+        if next_page:
+            next_page_url = urljoin(self.base_url, next_page[0])
+            yield Request(url=next_page_url,
+                          callback=self.parse_links
+                          )
