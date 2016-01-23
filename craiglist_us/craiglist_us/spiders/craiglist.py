@@ -73,3 +73,17 @@ class CraiglistSpider(Spider):
             yield Request(url=next_page_url,
                           callback=self.parse_links
                           )
+
+    def parse_data(self, response):
+        # extract the data from the details page
+        # XPATHS SECTION
+        TITLE_XPATH = '//span[@class="postingtitletext"]/text()'
+        DESCRIPTION_XAPTH = '//section[@id="postingbody"]//text()'
+
+        # DATA EXTRACTION
+        title = response.xpath(TITLE_XPATH).extract()
+        description = response.xpath(DESCRIPTION_XAPTH).extract()
+
+        # CLEANING THE DATA
+        title = ' '.join(' '.join(title).split()) if title else ''
+        description = ' '.join(' '.join(description).split()) if title else ''
