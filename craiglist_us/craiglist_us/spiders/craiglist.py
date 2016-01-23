@@ -55,7 +55,18 @@ class CraiglistSpider(Spider):
         NEXT_PAGE_XPATH = '//a[@class="button next"]/@href'
 
         links = response.xpath(LINKS_XPATH).extract()
-        
+        # if no links are present exit from the function
+        if links:
+            for link in links:
+                # converting the relative url to absolute url
+                url = urljoin(self.base_url, link[0])
+                yield Request(url=url,
+                              callback=self.parse_data
+                              )
+        else:
+            return
+
+        # pagination
         next_page = response.xpath(NEXT_PAGE_XPATH).extract()
         if next_page:
             next_page_url = urljoin(self.base_url, next_page[0])
