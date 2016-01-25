@@ -83,15 +83,22 @@ class CraiglistSpider(Spider):
         DESCRIPTION_XAPTH = '//section[@id="postingbody"]//text()'
         POST_ID_XPATH = '//p[@class="postinginfo" and contains(text(), "post id:")]/text()'
         POSTED_DATE_XPATH = '//p[@class="postinginfo reveal" and contains(text(), "posted: ")]/time/text()'
+        POST_UPDATED_DATE_XPATH = '//p[@class="postinginfo reveal" and contains(text(), "updated: ")]/time/text()'
+        LATITUDE_XPATH = '//div[@id="map"]/@data-latitude'
+
 
         # DATA EXTRACTION
         title = response.xpath(TITLE_XPATH).extract()
         description = response.xpath(DESCRIPTION_XAPTH).extract()
         post_id = response.xpath(POST_ID_XPATH).extract()
         posted_on = response.xpath(POSTED_DATE_XPATH).extract()
+        posted_updated_on = response.xpath(POST_UPDATED_DATE_XPATH).extract()
+        latitude = response.xpath(LATITUDE_XPATH).extract()
 
         # CLEANING THE DATA
         title = ' '.join(' '.join(title).split()) if title else ''
         description = ' '.join(' '.join(description).split()) if title else ''
         post_id = post_id[0].strip().replace('post id:', '').strip() if post_id else ''
         posted_on = posted_on[0].strip() if posted_on else ''
+        posted_updated_on = posted_updated_on[0].strip() if posted_updated_on else ''
+        latitude = latitude[0].strip() if latitude else ''
