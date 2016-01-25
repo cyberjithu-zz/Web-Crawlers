@@ -10,7 +10,7 @@ from craiglist_us.items import CraiglistUsItem
 
 class CraiglistSpider(Spider):
     name = "craiglist"
-    allowed_domains = ["craiglist.org"]
+    allowed_domains = ["craigslist.org"]
     start_urls = (
         'http://www.craigslist.org/about/areas.json',
     )
@@ -34,23 +34,10 @@ class CraiglistSpider(Spider):
         except Exception, e:
             raise e
         # url format : CITYNAME.craiglist.org
-        for city in area_json:
+        for city in area_json[:2]:
             if city.get('hostname'):
-                url = '%s.craigslist.org' % city.get('hostname')
-                yield Request(url=url, callback=self.parse_category)
-
-    def parse_category(self, response):
-        # base xpath for category links and text
-        CATEGORIES_BASE_XPATH = '//div[@id="bbb"]/div[@class="cats"]/ul/li/a'
-        for link in response.xpath(CATEGORIES_BASE_XPATH):
-            # category url, need to append base url
-            url = link.xpath('./@href').extract()
-            if url:
-                # converting the relative url to absolute url
-                url = urljoin(self.base_url, url[0])
-                yield Request(url=url,
-                              callback=self.parse_links,
-                              )
+                url = 'http://%s.craigslist.org/search/rts' % city.get('hostname')
+                yield Request(url=url, callback=self.parse_links)
 
     def parse_links(self, response):
         LINKS_XPATH = '//span[@class="rows"]/p[@class="row"]/a/@href'
@@ -61,7 +48,7 @@ class CraiglistSpider(Spider):
         if links:
             for link in links:
                 # converting the relative url to absolute url
-                url = urljoin(self.base_url, link[0])
+                url = urljoin(self.base_url, link)
                 yield Request(url=url,
                               callback=self.parse_data
                               )
@@ -125,6 +112,7 @@ class CraiglistSpider(Spider):
                                 description=description,
                                 post=post,
                                 geo=geo,
-                                categories=categories
+                                categories=categories,
+                                url=response.url
                             )
         yield item

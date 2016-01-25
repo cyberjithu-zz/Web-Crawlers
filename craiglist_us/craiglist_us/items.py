@@ -16,3 +16,4 @@ class CraiglistUsItem(scrapy.Item):
     post = scrapy.Field()
     geo = scrapy.Field()
     categories = scrapy.Field()
+    url = scrapy.Field()
