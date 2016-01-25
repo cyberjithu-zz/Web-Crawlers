@@ -11,4 +11,8 @@ import scrapy
 class CraiglistUsItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    pass
+    title = scrapy.Field()
+    description = scrapy.Field()
+    post = scrapy.Field()
+    geo = scrapy.Field()
+    categories = scrapy.Field()

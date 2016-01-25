@@ -5,6 +5,8 @@ from urlparse import urljoin
 from scrapy import Spider
 from scrapy.http import Request
 
+from craiglist_us.items import CraiglistUsItem
+
 
 class CraiglistSpider(Spider):
     name = "craiglist"
@@ -86,7 +88,7 @@ class CraiglistSpider(Spider):
         POST_UPDATED_DATE_XPATH = '//p[@class="postinginfo reveal" and contains(text(), "updated: ")]/time/text()'
         LATITUDE_XPATH = '//div[@id="map"]/@data-latitude'
         LONGITUDE_XPATH = '//div[@id="map"]/@data-longitude'
-
+        CATEGORIES_XPATH = '//ul[@class="breadcrumbs"]/li/a/text()'
 
         # DATA EXTRACTION
         title = response.xpath(TITLE_XPATH).extract()
@@ -96,13 +98,33 @@ class CraiglistSpider(Spider):
         posted_updated_on = response.xpath(POST_UPDATED_DATE_XPATH).extract()
         latitude = response.xpath(LATITUDE_XPATH).extract()
         longitude = response.xpath(LONGITUDE_XPATH).extract()
+        categories = response.xpath(CATEGORIES_XPATH).extract()
 
         # CLEANING THE DATA
         title = ' '.join(' '.join(title).split()) if title else ''
         description = ' '.join(' '.join(description).split()) if title else ''
-        post_id = post_id[0].strip().replace('post id:', '').strip() if post_id else ''
+        post_id = post_id[0].strip().replace(
+            'post id:', '').strip() if post_id else ''
         posted_on = posted_on[0].strip() if posted_on else ''
-        posted_updated_on = posted_updated_on[0].strip() if posted_updated_on else ''
+        posted_updated_on = posted_updated_on[
+            0].strip() if posted_updated_on else ''
         latitude = latitude[0].strip() if latitude else ''
         longitude = longitude[0].strip() if longitude else ''
-        
+        categories = [category.strip()
+                      for category in categories if category.strip()] if categories else []
+        # post details
+        post = {'id': post_id,
+                'posted_on': posted_on,
+                'updated_on': posted_updated_on
+                }
+        # geo details
+        geo = {'latitude': latitude, 'longitude': longitude}
+        # create item class object
+        item = CraiglistUsItem(
+                                title=title,
+                                description=description,
+                                post=post,
+                                geo=geo,
+                                categories=categories
+                            )
+        yield item
