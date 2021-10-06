@@ -12,7 +12,7 @@ pycparser==2.14
 pyOpenSSL==17.5.0
 python-dateutil==2.4.2
 queuelib==1.4.2
-Scrapy==1.0.4
+Scrapy==1.8.1
 service-identity==14.0.0
 six==1.10.0
 Twisted==15.5.0
